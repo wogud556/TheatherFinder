@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "833896687251",
+    "firebase_url": "https://theater-finder-a5dbc.firebaseio.com",
+    "project_id": "theater-finder-a5dbc",
+    "storage_bucket": "theater-finder-a5dbc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833896687251:android:d35948455fa91f85",
+        "android_client_info": {
+          "package_name": "kr.ac.hansung.thetherfinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "833896687251-2melcpmqtsaig9akl68sps4ers0p2gks.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kr.ac.hansung.thetherfinder",
+            "certificate_hash": "b566b51a15150645c792f9950e7da8bf2a8243c8"
+          }
+        },
+        {
+          "client_id": "833896687251-g2gq2ms5i6dv1dkn5mfnngg9hbftfcpb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDn_pzA7f_l9eLiv442MYDHfEwMbbU64aI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "833896687251-g2gq2ms5i6dv1dkn5mfnngg9hbftfcpb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
