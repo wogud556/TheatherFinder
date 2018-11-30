@@ -2,12 +2,12 @@ package kr.ac.hansung.thetherfinder;
 
 public class Theather {
     private String Location;
-    private double Lnt;
+    private double Lng;
     private double Lat;
-
-    public Theather(String Location, double Lnt, double Lat){
+    public Theather(){}
+    public Theather(String Location, double Lng, double Lat){
         this.Location = Location;
-        this.Lnt = Lnt;
+        this.Lng = Lng;
         this.Lat = Lat;
     }
     public String getLocation(){
@@ -17,10 +17,10 @@ public class Theather {
         this.Location= Location;
     }
     public double getLnt(){
-        return Lnt;
+        return Lng;
     }
-    public void setLnt(double Lnt){
-        this.Lnt= Lnt;
+    public void setLnt(double Lng){
+        this.Lng= Lng;
     }
     public double getLat(){
         return Lat;
@@ -29,8 +29,4 @@ public class Theather {
         this.Lat= Lat;
     }
 
-    @Override
-    public String toString() {
-        return "Lnt = " + Lnt +  ", Lat=" + Lat + ", Location = " + Location;
-    }
 }

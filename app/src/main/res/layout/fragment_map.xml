@@ -7,36 +7,9 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <ToggleButton
-            android:id="@+id/GCV"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Cgv" />
-
-        <ToggleButton
-            android:id="@+id/MEGA"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="ToggleButton" />
-
-        <ToggleButton
-            android:id="@+id/LOTTE"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="ToggleButton" />
-    </LinearLayout>
-
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="476dp"
+        android:layout_height="match_parent"
         android:layout_gravity="bottom" />
 </FrameLayout>

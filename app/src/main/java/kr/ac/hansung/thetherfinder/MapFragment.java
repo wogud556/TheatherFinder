@@ -27,6 +27,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -58,6 +59,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     GoogleMap Cgvm, Megam, Lottem;
     View rootView;
     MapView mapView;
+    GoogleMap mGooglemap;
     private DatabaseReference databaseReference;
     ArrayList<Theather> theatherList = new ArrayList<Theather>();
     private final static String TAG = "MapFragment";
@@ -126,40 +128,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mapView.onCreate(savedInstanceState);
         }
     }
-    class CallJson extends Thread{
-        OkHttpClient okHttpClient = new OkHttpClient();
-        String urlStr;
-        JSONObject result;
-        JSONArray jsonArray;
-        String location;
-        String Lng, Lat;
-
-        public CallJson(String insStr){
-            urlStr = insStr;
-        }
-
-        public void CallJson(){
-            try{
-                Request request = new Request.Builder()
-                        .url(urlStr)
-                        .build();
-                Response response = okHttpClient.newCall(request).execute();
-                jsonArray = new JSONArray(response.body().string());
-                for(int i=0; i<jsonArray.length();i++){
-                    result = jsonArray.getJSONObject(i);
-                    location = result.getString("Location");
-                    Lng = result.getString("Lng");
-                    Lat = result.getString("Lat");
-                    Log.d("MapFragment", "Location = " + location + "Lng + " + Lng + "Lat = " + Lat);
-
-                }
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-
-        }
-
-    }
     void cgvshow(){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("어플이 존재하지 않습니다");
@@ -216,36 +184,137 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
         MapsInitializer.initialize(this.getActivity());
 
-        CallJson CGV = new CallJson(cgv);
-        CGV.start();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(37.535779,126.734406), 14);
         googleMap.animateCamera(cameraUpdate);
-        googleMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(37.535779,126.734406))
-                    .title("루프리"));
-        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("cgv").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onInfoWindowClick(Marker marker) {
-                Context context  = getActivity();
-                Intent mega1 = context.getPackageManager().getLaunchIntentForPackage("com.megabox.mop");
-                Intent cgv1 = context.getPackageManager().getLaunchIntentForPackage("com.cgv.android.movieapp");
-                Intent lotte = context.getPackageManager().getLaunchIntentForPackage("kr.co.lottecinema.lc");
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    String Lnt = snapshot.child("Lng").getValue().toString();
+                    String Lat = snapshot.child("Lat").getValue().toString();
+                   // Object Lat = snapshot.eq("Lat");
+                    String Location = snapshot.child("Location").getValue().toString();
+                    System.out.println(Lnt);
+                    Log.d(TAG, "result"+snapshot.getValue());
+                   googleMap.addMarker(new MarkerOptions()
+                   .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
+                    .title(Location + "CGV")
+                           .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                   googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                       @Override
+                       public void onInfoWindowClick(Marker marker) {
+                           Context context = getActivity();
+                           Intent cgv1 = context.getPackageManager().getLaunchIntentForPackage("com.cgv.android.movieapp");
 
-                try{
-                    if(cgv1 == null){
-                        cgvshow();
-                    }else{
-                        cgv1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(cgv1);
-                    }
-                }catch(Exception e){
-                    e.printStackTrace();
+                           try{
+                               if(lotte == null){
+                                   cgvshow();
+                               }else{
+                                   cgv1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                   startActivity(cgv1);
+                               }
+                           }catch(Exception e){
+                               e.printStackTrace();
+                           }
+                       }
+                   });
                 }
             }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
         });
+        databaseReference.child("lotte").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    String Lnt = snapshot.child("Lng").getValue().toString();
+                    String Lat = snapshot.child("Lat").getValue().toString();
+                    // Object Lat = snapshot.eq("Lat");
+                    String Location = snapshot.child("Location").getValue().toString();
+                    System.out.println(Lnt);
+                    Log.d(TAG, "result"+snapshot.getValue());
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
+                            .title(Location + "롯데시네마")
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                    googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                        @Override
+                        public void onInfoWindowClick(Marker marker) {
+                            Context context = getActivity();
+                            Intent lotte = context.getPackageManager().getLaunchIntentForPackage("kr.co.lottecinema.lc");
+
+                            try{
+                                if(lotte == null){
+                                    lotteshow();
+                                }else{
+                                    lotte.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(lotte);
+                                }
+                            }catch(Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        databaseReference.child("mega").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    String Lnt = snapshot.child("Lng").getValue().toString();
+                    String Lat = snapshot.child("Lat").getValue().toString();
+                    // Object Lat = snapshot.eq("Lat");
+                    String Location = snapshot.child("Location").getValue().toString();
+                    System.out.println(Lnt);
+                    Log.d(TAG, "result"+snapshot.getValue());
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
+                            .title(Location + "메가박스")
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+
+                    googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                        @Override
+                        public void onInfoWindowClick(Marker marker) {
+                            Context context  = getActivity();
+                            Intent mega1 = context.getPackageManager().getLaunchIntentForPackage("com.megabox.mop");
+
+                            try{
+                                    if(mega1 == null){
+                                        megashow();
+                                    }else{
+                                        mega1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(mega1);
+                                    }
+                            }catch(Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     /*public void CaptureMapScreen() {
