@@ -9,7 +9,6 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="화면캡쳐" />
     </group>
-
     <item android:title="Communicate">
         <menu>
             <item
