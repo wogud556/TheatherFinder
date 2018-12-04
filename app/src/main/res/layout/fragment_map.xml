@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,15 +18,18 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
+        android:layout_gravity="bottom|start"
         android:layout_margin="@dimen/fab_margin"
-        tools:src="@tools:sample/backgrounds/scenic" />
+        app:backgroundTint="@color/colorPrimary"
+        tools:src="@drawable/ic_my_location_black_24dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start|end"
-        android:layout_margin="16dp"
-        tools:src="@tools:sample/backgrounds/scenic[2]" />
+        android:layout_gravity="start"
+        android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@color/common_google_signin_btn_text_dark_default"
+        tools:src="@drawable/ic_my_location_black_24dp" />
+
 </FrameLayout>

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.net.Uri;
@@ -36,7 +37,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -51,6 +54,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -120,13 +124,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
 
     }
-    private void openScreenshot(File imageFile) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        Uri uri = Uri.fromFile(imageFile);
-        intent.setDataAndType(uri, "image/*");
-        startActivity(intent);
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -135,7 +132,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         mapView = (MapView)rootView.findViewById(R.id.mapView);
         mapView.getMapAsync(this);
         fab = (FloatingActionButton)rootView.findViewById(R.id.fab);
-        fab2 = (FloatingActionButton)rootView.findViewById(R.id.fab2);
+        fab2= (FloatingActionButton)rootView.findViewById(R.id.fab2);
         return rootView;
     }
 
@@ -236,6 +233,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         MapsInitializer.initialize(this.getActivity());
+        UiSettings ui = googleMap.getUiSettings();
+        ui.setZoomControlsEnabled(true);
+        ui.setCompassEnabled(true);
         //currentLocation();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(37.535779,126.734406), 14);
         googleMap.animateCamera(cameraUpdate);
@@ -295,8 +295,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                     String Lat = snapshot.child("Lat").getValue().toString();
                     // Object Lat = snapshot.eq("Lat");
                     String Location = snapshot.child("Location").getValue().toString();
-                    System.out.println(Lnt);
-                    Log.d(TAG, "result"+snapshot.getValue());
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
                             .title(Location +" " + megabox)
@@ -305,6 +303,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
                 }
             }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        databaseReference.child("other").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    String theather = snapshot.child("Theather").getValue().toString();
+                    String Lnt = snapshot.child("Lng").getValue().toString();
+                    String Lat = snapshot.child("Lat").getValue().toString();
+                    String Location = snapshot.child("Location").getValue().toString();
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
+                            .title(theather +" " + Location)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                }
+            }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -336,13 +354,86 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                             startActivity(lotte);
                         }
 
-                    }else{
-                        if(lotte == null){
+                    }else if(maker.contains("메가박스")) {
+                        if (mega1 == null) {
                             megashow();
-                        }else{
+                        } else {
                             mega1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(mega1);
                         }
+                    }else{
+                        if(maker.contains("서울극장")) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("서울극장을 선택하셨습니다");
+                            builder.setMessage("웹페이지로 이동할까요?");
+                            builder.setPositiveButton("예",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://m.seoulcinema.com/main/main.php")));
+                                        }
+                                    });
+                            builder.setNegativeButton("아니오",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            builder.show();
+                        }else if(maker.contains("아트하우스모모")) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("아트하우스 모모를 선택하셨습니다");
+                            builder.setMessage("웹페이지로 이동할까요?");
+                            builder.setPositiveButton("예",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.arthousemomo.co.kr/")));
+                                        }
+                                    });
+                            builder.setNegativeButton("아니오",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            builder.show();
+                        }else if(maker.contains("씨네큐브")){
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("씨네큐브를 선택하셨습니다");
+                            builder.setMessage("웹페이지로 이동할까요?");
+                            builder.setPositiveButton("예",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.cinecube.co.kr/")));
+                                        }
+                                    });
+                            builder.setNegativeButton("아니오",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            builder.show();
+                        }else if(maker.contains("상상마당")) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("KT&G 상상마당을 선택하셨습니다");
+                            builder.setMessage("웹페이지로 이동할까요?");
+                            builder.setPositiveButton("예",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.sangsangmadang.com/")));
+                                        }
+                                    });
+                            builder.setNegativeButton("아니오",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            builder.show();
+                        }else {
+
+                        }
+
                     }
                 }catch(Exception e){
                     e.printStackTrace();
@@ -373,7 +464,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                                             .position(latLng)
                                             .title("나")
                                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-
+                                    googleMap.addCircle(new CircleOptions()
+                                                            .center(latLng)
+                                                            .radius(5000)
+                                                            .strokeColor(Color.BLUE)
+                                                            .strokeWidth(1.0f)
+                                                            .fillColor(Color.parseColor("#220000ff")));
                                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
                                     googleMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
@@ -382,49 +478,55 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                         });
             }
         });
-        /*fab2.setOnClickListener(new View.OnClickListener() {
+        fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Date now = new Date();
-                android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+               GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
 
-                try {
-                    // image naming and path  to include sd card  appending name you choose for file
-                    // 저장할 주소 + 이름
-                    String mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
+                   @Override
+                   public void onSnapshotReady(Bitmap bitmap) {
 
-                    // create bitmap screen capture
-                    // 화면 이미지 만들기
-                    View v1 = getActivity().getWindow().getDecorView().getRootView();
-                    v1.setDrawingCacheEnabled(true);
-                    Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
-                    v1.setDrawingCacheEnabled(false);
+                       Date now = new Date();
+                       android.text.format.DateFormat.format("hh:mm:ss", now);
+                       try {
+                           // image naming and path  to include sd card  appending name you choose for file
+                           // 저장할 주소 + 이름
+                           String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/kr.ac.hansung.thetherfinder" + "/capture_"+now+".jpg";
 
-                    // 이미지 파일 생성
-                    File imageFile = new File(mPath);
-                    FileOutputStream outputStream = new FileOutputStream(imageFile);
-                    int quality = 100;
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
-                    outputStream.flush();
-                    outputStream.close();
+                           // create bitmap screen capture
+                           // 화면 이미지 만들기
+                           View v1 = getActivity().getWindow().getDecorView().getRootView();
+                           v1.setDrawingCacheEnabled(true);
 
-                    openScreenshot(imageFile);
-                } catch (Throwable e) {
-                    // Several error may come out with file handling or OOM
-                    e.printStackTrace();
-                }
+                           // 이미지 파일 생성
+                           File imageFile = new File(mPath);
+                           FileOutputStream outputStream = new FileOutputStream(imageFile);
+                           int quality = 100;
+                           bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+                           outputStream.flush();
+                           outputStream.close();
+
+                           Toast.makeText(getActivity(), mPath +"에 "+now+".jpg 이름으로 저장되었습니다", Toast.LENGTH_LONG).show();
+
+                       } catch (Throwable e) {
+                           // Several error may come out with file handling or OOM
+                           e.printStackTrace();
+                       }
+
+                   }
+               };
+               googleMap.snapshot(callback);
             }
-        });*/
+        });
 
     }
-    //캡쳐버튼클릭
-
-   public void currentLocation() {
-
-
+    private void openScreenshot(File imageFile) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri uri = Uri.fromFile(imageFile);
+        intent.setDataAndType(uri, "image/*");
+        startActivity(intent);
     }
-
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 

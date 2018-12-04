@@ -5,9 +5,13 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/capture"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="화면캡쳐" />
+            android:id="@+id/now_movie"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="현재 상영작" />
+        <item
+            android:id="@+id/best_movie"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="박스 오피스" />
     </group>
     <item android:title="Communicate">
         <menu>

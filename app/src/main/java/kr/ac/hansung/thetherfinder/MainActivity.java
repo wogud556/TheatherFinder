@@ -20,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     private FirebaseAuth mfirebaseAuth;
     private Fragment fragment;
     private FirebaseUser mfirebaseUser;
+    private TextView txtname, txtEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +68,14 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-
+        View headherView = navigationView.getHeaderView(0);
         MapFragment mapFragment = new MapFragment();
         getSupportFragmentManager().beginTransaction()
             .replace(R.id.mainFragment, mapFragment, "main").commit();
+        txtEmail = (TextView)headherView.findViewById(R.id.txtEmail);
+        txtname = (TextView)headherView.findViewById(R.id.txtname);
+        navigationView.setNavigationItemSelectedListener(this);
+        profileUpdate();
 
     }
 
@@ -102,7 +106,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Toast.makeText(MainActivity.this, "TheatherFinder\n 컴퓨터공학과 1492059 박재형, 1492076 장주영, 1492080 조준혁\n 사용 플랫폼 : Java, Firebase Auth, Firebase Realtime Database\n Google Map Api", Toast.LENGTH_LONG).show();
+        }else if(id == R.id.action_logout){
+
+            logout();
         }
 
         return super.onOptionsItemSelected(item);
@@ -112,20 +119,30 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         View v;
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.capture) {
+        if (id == R.id.best_movie) {
 
-        }  else{
+        }else if(id == R.id.now_movie){
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
+    private void profileUpdate(){
+        txtEmail.setText(mfirebaseUser.getEmail());
+        txtname.setText(mfirebaseUser.getDisplayName());
+    }
+    public void logout(){
+        mfirebaseAuth.signOut();
+        finish();
+        startActivity(new Intent(MainActivity.this, AuthActivity.class));
+    }
 
 
 }
