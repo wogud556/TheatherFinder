@@ -10,6 +10,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.net.Uri;
@@ -62,6 +64,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import android.content.pm.PackageManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 
@@ -99,6 +103,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     private  GoogleApiClient googleApiClient;
     private GoogleMap gmap;
     private FusedLocationProviderClient fusedLocationProviderClient;
+    private Geocoder geocoder;
+    private Button button;
+    private EditText editText;
 
     public MapFragment(){
 
@@ -128,7 +135,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_map, container, false);
-
+        editText = (EditText)rootView.findViewById(R.id.edFind);
+        button = (Button)rootView.findViewById(R.id.btnFind);
         mapView = (MapView)rootView.findViewById(R.id.mapView);
         mapView.getMapAsync(this);
         fab = (FloatingActionButton)rootView.findViewById(R.id.fab);
@@ -233,6 +241,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         MapsInitializer.initialize(this.getActivity());
+        geocoder = new Geocoder(getActivity());
         UiSettings ui = googleMap.getUiSettings();
         ui.setZoomControlsEnabled(true);
         ui.setCompassEnabled(true);
@@ -519,6 +528,50 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             }
         });
 
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String str= editText.getText().toString();;
+                List<Address> addressList = null;
+                try{
+                    addressList = geocoder.getFromLocationName(
+                            str, 10);
+                    System.out.println(addressList.get(0).toString());
+                    //콤마를 기준으로 split
+                    System.out.println(addressList.get(0).toString());
+
+                    String [] splitStr = addressList.get(0).toString().split(",");
+                    String address = splitStr[0].substring(splitStr[0].indexOf("\"")+1,splitStr[0].length());
+                    System.out.println(address);
+                    String latitude = splitStr[10].substring(splitStr[10].indexOf("=") + 1); // 위도
+                    String longitude = splitStr[12].substring(splitStr[12].indexOf("=") + 1); // 경도
+                    System.out.println(latitude);
+                    System.out.println(longitude);
+
+                    // 좌표(위도, 경도) 생성
+                    LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(point)
+                            .title(str)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                    googleMap.addCircle(new CircleOptions()
+                            .center(point)
+                            .radius(5000)
+                            .strokeColor(Color.BLUE)
+                            .strokeWidth(1.0f)
+                            .fillColor(Color.parseColor("#220000ff")));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point,15));
+                    googleMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
+                }catch(NullPointerException e){
+                    Toast.makeText(getActivity() , "잘못된 입력입니다", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
+
+            }
+
+        });
     }
     private void openScreenshot(File imageFile) {
         Intent intent = new Intent();
