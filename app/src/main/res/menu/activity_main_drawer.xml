@@ -9,16 +9,16 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="현재 상영작" />
         <item
-            android:id="@+id/best_movie"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="박스 오피스" />
+            android:id="@+id/map_contact"
+            android:icon="@drawable/ic_my_location_black_24dp"
+            android:title="영화위치지도" />
     </group>
     <item android:title="Communicate">
         <menu>
             <item
                 android:id="@+id/share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="공유하기" />
+                android:title="친구에게 어플추천" />
         </menu>
     </item>
 

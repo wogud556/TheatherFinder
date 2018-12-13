@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -63,9 +64,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import android.content.pm.PackageManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 
@@ -100,14 +104,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     public static final int REQUEST_CODE_PERMISSIONS = 1000;
     private final static String TAG = "MapFragment";
     private FloatingActionButton fab, fab2;
-    private  GoogleApiClient googleApiClient;
+    private GoogleApiClient googleApiClient;
     private GoogleMap gmap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Geocoder geocoder;
     private Button button;
     private EditText editText;
 
-    public MapFragment(){
+    public MapFragment() {
 
     }
 
@@ -119,7 +123,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(googleApiClient == null){
+        if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(getActivity())
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
@@ -135,12 +139,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_map, container, false);
-        editText = (EditText)rootView.findViewById(R.id.edFind);
-        button = (Button)rootView.findViewById(R.id.btnFind);
-        mapView = (MapView)rootView.findViewById(R.id.mapView);
+        editText = (EditText) rootView.findViewById(R.id.edFind);
+        button = (Button) rootView.findViewById(R.id.btnFind);
+        mapView = (MapView) rootView.findViewById(R.id.mapView);
         mapView.getMapAsync(this);
-        fab = (FloatingActionButton)rootView.findViewById(R.id.fab);
-        fab2= (FloatingActionButton)rootView.findViewById(R.id.fab2);
+        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab2 = (FloatingActionButton) rootView.findViewById(R.id.fab2);
         return rootView;
     }
 
@@ -179,11 +183,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if(mapView !=null){
+        if (mapView != null) {
             mapView.onCreate(savedInstanceState);
         }
     }
-    void cgvshow(){
+
+    void cgvshow() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("어플이 존재하지 않습니다");
         builder.setMessage("플레이스토어로 이동할까요?");
@@ -201,7 +206,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 });
         builder.show();
     }
-    void lotteshow(){
+
+    void lotteshow() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("어플이 존재하지 않습니다");
         builder.setMessage("플레이스토어로 이동할까요?");
@@ -219,7 +225,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 });
         builder.show();
     }
-    void megashow(){
+
+    void megashow() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("어플이 존재하지 않습니다");
         builder.setMessage("플레이스토어로 이동할까요?");
@@ -246,23 +253,48 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         ui.setZoomControlsEnabled(true);
         ui.setCompassEnabled(true);
         //currentLocation();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(37.535779,126.734406), 14);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(37.535779, 126.734406), 14);
         googleMap.animateCamera(cameraUpdate);
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("star").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String Lnt = snapshot.child("Lng").getValue().toString();
+                    String Lat = snapshot.child("Lat").getValue().toString();
+                    // Object Lat = snapshot.eq("Lat");
+                    String Location = snapshot.child("Location").getValue().toString();
+                    System.out.println(Lnt);
+                    Log.d(TAG, "result" + snapshot.getValue());
+                    BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.starbucks);
+                    Bitmap b = bitmapDrawable.getBitmap();
+                    Bitmap small = Bitmap.createScaledBitmap(b, 100, 100, false);
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
+                            .title(Location + " 스타벅스")
+                            .icon(BitmapDescriptorFactory.fromBitmap(small)));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         databaseReference.child("cgv").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String Lnt = snapshot.child("Lng").getValue().toString();
                     String Lat = snapshot.child("Lat").getValue().toString();
-                   // Object Lat = snapshot.eq("Lat");
+                    // Object Lat = snapshot.eq("Lat");
                     String Location = snapshot.child("Location").getValue().toString();
                     System.out.println(Lnt);
-                    Log.d(TAG, "result"+snapshot.getValue());
-                   googleMap.addMarker(new MarkerOptions()
-                   .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
-                    .title(Location + " CGV")
-                           .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                    Log.d(TAG, "result" + snapshot.getValue());
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
+                            .title(Location + " CGV")
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                 }
             }
 
@@ -275,13 +307,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         databaseReference.child("lotte").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String Lnt = snapshot.child("Lng").getValue().toString();
                     String Lat = snapshot.child("Lat").getValue().toString();
                     // Object Lat = snapshot.eq("Lat");
                     String Location = snapshot.child("Location").getValue().toString();
                     System.out.println(Lnt);
-                    Log.d(TAG, "result"+snapshot.getValue());
+                    Log.d(TAG, "result" + snapshot.getValue());
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
                             .title(Location + " 롯데시네마")
@@ -298,7 +330,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         databaseReference.child("mega").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String megabox = " 메가박스";
                     String Lnt = snapshot.child("Lng").getValue().toString();
                     String Lat = snapshot.child("Lat").getValue().toString();
@@ -306,12 +338,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                     String Location = snapshot.child("Location").getValue().toString();
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
-                            .title(Location +" " + megabox)
+                            .title(Location + " " + megabox)
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 
 
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -320,14 +353,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         databaseReference.child("other").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String theather = snapshot.child("Theather").getValue().toString();
                     String Lnt = snapshot.child("Lng").getValue().toString();
                     String Lat = snapshot.child("Lat").getValue().toString();
                     String Location = snapshot.child("Location").getValue().toString();
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
-                            .title(theather +" " + Location)
+                            .title(theather + " " + Location)
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                 }
             }
@@ -340,38 +373,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                Context context  = getActivity();
+                Context context = getActivity();
                 Intent mega1 = context.getPackageManager().getLaunchIntentForPackage("com.megabox.mop");
                 Intent lotte = context.getPackageManager().getLaunchIntentForPackage("kr.co.lottecinema.lcm");
                 Intent cgv1 = context.getPackageManager().getLaunchIntentForPackage("com.cgv.android.movieapp");
-                try{
-                    String  maker = marker.getTitle();
-                    if(maker.contains("CGV")){
-                        if(cgv1 ==  null){
+                try {
+                    String maker = marker.getTitle();
+                    if (maker.contains("CGV")) {
+                        if (cgv1 == null) {
                             cgvshow();
 
-                        }else{
+                        } else {
                             cgv1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(cgv1);
                         }
 
-                    }else if(maker.contains("롯데시네마")){
-                        if(lotte == null){
+                    } else if (maker.contains("롯데시네마")) {
+                        if (lotte == null) {
                             lotteshow();
-                        }else{
+                        } else {
                             lotte.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(lotte);
                         }
 
-                    }else if(maker.contains("메가박스")) {
+                    } else if (maker.contains("메가박스")) {
                         if (mega1 == null) {
                             megashow();
                         } else {
                             mega1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(mega1);
                         }
-                    }else{
-                        if(maker.contains("서울극장")) {
+                    } else {
+                        if (maker.contains("서울극장")) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                             builder.setTitle("서울극장을 선택하셨습니다");
                             builder.setMessage("웹페이지로 이동할까요?");
@@ -388,7 +421,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                                         }
                                     });
                             builder.show();
-                        }else if(maker.contains("아트하우스모모")) {
+                        } else if (maker.contains("아트하우스모모")) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                             builder.setTitle("아트하우스 모모를 선택하셨습니다");
                             builder.setMessage("웹페이지로 이동할까요?");
@@ -405,7 +438,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                                         }
                                     });
                             builder.show();
-                        }else if(maker.contains("씨네큐브")){
+                        } else if (maker.contains("씨네큐브")) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                             builder.setTitle("씨네큐브를 선택하셨습니다");
                             builder.setMessage("웹페이지로 이동할까요?");
@@ -422,7 +455,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                                         }
                                     });
                             builder.show();
-                        }else if(maker.contains("상상마당")) {
+                        } else if (maker.contains("상상마당")) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                             builder.setTitle("KT&G 상상마당을 선택하셨습니다");
                             builder.setMessage("웹페이지로 이동할까요?");
@@ -439,12 +472,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                                         }
                                     });
                             builder.show();
-                        }else {
+                        } else {
 
                         }
 
                     }
-                }catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -467,18 +500,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                         new OnSuccessListener<Location>() {
                             @Override
                             public void onSuccess(Location location) {
-                                if(location != null){
+                                if (location != null) {
                                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                                     googleMap.addMarker(new MarkerOptions()
                                             .position(latLng)
                                             .title("나")
                                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                                     googleMap.addCircle(new CircleOptions()
-                                                            .center(latLng)
-                                                            .radius(5000)
-                                                            .strokeColor(Color.BLUE)
-                                                            .strokeWidth(1.0f)
-                                                            .fillColor(Color.parseColor("#220000ff")));
+                                            .center(latLng)
+                                            .radius(5000)
+                                            .strokeColor(Color.BLUE)
+                                            .strokeWidth(1.0f)
+                                            .fillColor(Color.parseColor("#220000ff")));
                                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
                                     googleMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
@@ -490,58 +523,58 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
+                GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
 
-                   @Override
-                   public void onSnapshotReady(Bitmap bitmap) {
+                    @Override
+                    public void onSnapshotReady(Bitmap bitmap) {
 
-                       Date now = new Date();
-                       android.text.format.DateFormat.format("hh:mm:ss", now);
-                       try {
-                           // image naming and path  to include sd card  appending name you choose for file
-                           // 저장할 주소 + 이름
-                           String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/kr.ac.hansung.thetherfinder" + "/capture_"+now+".jpg";
+                        Date now = new Date();
+                        android.text.format.DateFormat.format("hh:mm:ss", now);
+                        try {
+                            // image naming and path  to include sd card  appending name you choose for file
+                            // 저장할 주소 + 이름
+                            String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Pictures/Screenshots" + "/capture_" + now + ".jpg";
 
-                           // create bitmap screen capture
-                           // 화면 이미지 만들기
-                           View v1 = getActivity().getWindow().getDecorView().getRootView();
-                           v1.setDrawingCacheEnabled(true);
+                            // create bitmap screen capture
+                            // 화면 이미지 만들기
+                            View v1 = getActivity().getWindow().getDecorView().getRootView();
+                            v1.setDrawingCacheEnabled(true);
 
-                           // 이미지 파일 생성
-                           File imageFile = new File(mPath);
-                           FileOutputStream outputStream = new FileOutputStream(imageFile);
-                           int quality = 100;
-                           bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
-                           outputStream.flush();
-                           outputStream.close();
+                            // 이미지 파일 생성
+                            File imageFile = new File(mPath);
+                            FileOutputStream outputStream = new FileOutputStream(imageFile);
+                            int quality = 100;
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+                            outputStream.flush();
+                            outputStream.close();
 
-                           Toast.makeText(getActivity(), mPath +"에 "+now+".jpg 이름으로 저장되었습니다", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), mPath + "에 " + now + ".jpg 이름으로 저장되었습니다", Toast.LENGTH_LONG).show();
+                        } catch (Throwable e) {
+                            // Several error may come out with file handling or OOM
+                            e.printStackTrace();
+                        }
 
-                       } catch (Throwable e) {
-                           // Several error may come out with file handling or OOM
-                           e.printStackTrace();
-                       }
-
-                   }
-               };
-               googleMap.snapshot(callback);
+                    }
+                };
+                googleMap.snapshot(callback);
             }
         });
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String str= editText.getText().toString();;
+                String str = editText.getText().toString();
+                ;
                 List<Address> addressList = null;
-                try{
+                try {
                     addressList = geocoder.getFromLocationName(
                             str, 10);
                     System.out.println(addressList.get(0).toString());
                     //콤마를 기준으로 split
                     System.out.println(addressList.get(0).toString());
 
-                    String [] splitStr = addressList.get(0).toString().split(",");
-                    String address = splitStr[0].substring(splitStr[0].indexOf("\"")+1,splitStr[0].length());
+                    String[] splitStr = addressList.get(0).toString().split(",");
+                    String address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1, splitStr[0].length());
                     System.out.println(address);
                     String latitude = splitStr[10].substring(splitStr[10].indexOf("=") + 1); // 위도
                     String longitude = splitStr[12].substring(splitStr[12].indexOf("=") + 1); // 경도
@@ -556,16 +589,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
                     googleMap.addCircle(new CircleOptions()
                             .center(point)
-                            .radius(5000)
+                            .radius(500)
                             .strokeColor(Color.BLUE)
                             .strokeWidth(1.0f)
                             .fillColor(Color.parseColor("#220000ff")));
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point,15));
-                    googleMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
-                }catch(NullPointerException e){
-                    Toast.makeText(getActivity() , "잘못된 입력입니다", Toast.LENGTH_SHORT).show();
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
+                    googleMap.animateCamera(CameraUpdateFactory.zoomTo(15.0f));
+                } catch (NullPointerException e) {
+                    Toast.makeText(getActivity(), "잘못된 입력입니다", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
-                }catch(IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
@@ -573,13 +606,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
         });
     }
+
     private void openScreenshot(File imageFile) {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
         Uri uri = Uri.fromFile(imageFile);
-        intent.setDataAndType(uri, "image/*");
+        intent.setDataAndType(uri, "/Pictures/*");
         startActivity(intent);
     }
+
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 

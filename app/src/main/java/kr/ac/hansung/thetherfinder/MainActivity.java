@@ -119,14 +119,24 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         View v;
+        Intent intent = new Intent(Intent.ACTION_SEND);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.best_movie) {
-
+        if (id == R.id.map_contact) {
+            MapFragment mapFragment = new MapFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainFragment, mapFragment, "main").commit();
         }else if(id == R.id.now_movie){
+            DailyBoxOfficeFragment dailyBoxOfficeFragment = new DailyBoxOfficeFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainFragment, dailyBoxOfficeFragment,"main").commit();
+        }else if(id == R.id.share){
+            intent.setType("text/plain");
+            String text = "<TheatherFinder>\n제작자 : 박재형, 장주영, 조준혁\nTheatherFinder를 만들어보았습니다.\n함께 사용해보시고 피드백해주세요!!";
+            intent.putExtra(Intent.EXTRA_TEXT, text);
 
+            Intent chooser = Intent.createChooser(intent, "친구에게 공유하기");
+            startActivity(chooser);
         }
 
 
