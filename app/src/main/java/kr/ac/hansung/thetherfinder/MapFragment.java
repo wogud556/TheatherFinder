@@ -244,7 +244,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 });
         builder.show();
     }
-
+    void starshow() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("어플이 존재하지 않습니다");
+        builder.setMessage("플레이스토어로 이동할까요?");
+        builder.setPositiveButton("예",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.starbucks.co")));
+                    }
+                });
+        builder.setNegativeButton("아니오",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.istarbucks.co.kr/index.do")));
+                    }
+                });
+        builder.show();
+    }
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         MapsInitializer.initialize(this.getActivity());
@@ -287,10 +304,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String Lnt = snapshot.child("Lng").getValue().toString();
                     String Lat = snapshot.child("Lat").getValue().toString();
-                    // Object Lat = snapshot.eq("Lat");
                     String Location = snapshot.child("Location").getValue().toString();
                     System.out.println(Lnt);
-                    Log.d(TAG, "result" + snapshot.getValue());
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
                             .title(Location + " CGV")
@@ -310,10 +325,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String Lnt = snapshot.child("Lng").getValue().toString();
                     String Lat = snapshot.child("Lat").getValue().toString();
-                    // Object Lat = snapshot.eq("Lat");
                     String Location = snapshot.child("Location").getValue().toString();
                     System.out.println(Lnt);
-                    Log.d(TAG, "result" + snapshot.getValue());
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
                             .title(Location + " 롯데시네마")
@@ -334,7 +347,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                     String megabox = " 메가박스";
                     String Lnt = snapshot.child("Lng").getValue().toString();
                     String Lat = snapshot.child("Lat").getValue().toString();
-                    // Object Lat = snapshot.eq("Lat");
                     String Location = snapshot.child("Location").getValue().toString();
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
@@ -377,6 +389,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 Intent mega1 = context.getPackageManager().getLaunchIntentForPackage("com.megabox.mop");
                 Intent lotte = context.getPackageManager().getLaunchIntentForPackage("kr.co.lottecinema.lcm");
                 Intent cgv1 = context.getPackageManager().getLaunchIntentForPackage("com.cgv.android.movieapp");
+                Intent star = context.getPackageManager().getLaunchIntentForPackage("com.starbucks.co");
                 try {
                     String maker = marker.getTitle();
                     if (maker.contains("CGV")) {
@@ -403,7 +416,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                             mega1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(mega1);
                         }
-                    } else {
+                    }else if(maker.contains("스타벅스")) {
+                        if(star == null){
+                            starshow();
+                        }else{
+                            star.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(star);
+                        }
+                    }
+                    else {
                         if (maker.contains("서울극장")) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                             builder.setTitle("서울극장을 선택하셨습니다");

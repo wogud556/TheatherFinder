@@ -29,13 +29,19 @@ import javax.net.ssl.HttpsURLConnection;
 public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Holder> {
 
     private Context context;
-    private List<CardItem> list = new ArrayList<>(); Bitmap bitmap;
 
+    private List<CardItem> list = new ArrayList<>(); Bitmap bitmap;
+    public MyRecyclerViewClickListener mListener;
     public MyRecyclerAdapter(Context context, List<CardItem> list) {
         this.context = context;
         this.list = list;
     }
-
+    public void setOnClickListener(MyRecyclerViewClickListener listener){
+        mListener = listener;
+    }
+    public interface MyRecyclerViewClickListener{
+        void onItemClicked(int potition, String title, String name);
+    }
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_card, parent, false);
@@ -57,42 +63,18 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Ho
         holder.ranks.setText(list.get(itemposition).getRanks());
         holder.audi.setText(list.get(itemposition).getAudiA());
         holder.imageView.setImageBitmap(list.get(itemposition).getBitmap());
-        
-        /*
-        String url = "https://image.tmdb.org/t/p/w500" + list.get(position).getImage();
-        Glide.with(context)
-                .load(url)
-                .centerCrop()
-                .crossFade()
-                .into(holder.imageView);
-        */
-        /*Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL(Url);
-                    HttpsURLConnection conn = (HttpsURLConnection)url.openConnection();
-                    conn.setDoInput(true);
-                    conn.connect();
 
-                    InputStream is = conn.getInputStream();
-                    bitmap = BitmapFactory.decodeStream(is);
-
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        if(mListener != null){
+            final int pos = position;
+            final String title = list.get(itemposition).getOverview();
+            final String name = list.get(itemposition).getContents();
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.onItemClicked(pos, title, name);
                 }
-            }
-        };
-        thread.start();
-
-        try {
-            thread.join();
-            holder.imageView.setImageBitmap(bitmap);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+            });
+        }
     }
 
     @Override

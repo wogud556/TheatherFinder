@@ -1,7 +1,11 @@
 package kr.ac.hansung.thetherfinder;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,11 +24,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.support.constraint.Constraints.TAG;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DailyBoxOfficeFragment extends Fragment {
+public class DailyBoxOfficeFragment extends Fragment implements MyRecyclerAdapter.MyRecyclerViewClickListener {
 
     private RecyclerView recyclerView;
     private MyRecyclerAdapter adapter;
@@ -58,7 +64,21 @@ public class DailyBoxOfficeFragment extends Fragment {
         adapter = new MyRecyclerAdapter(getActivity(), list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
-
+        adapter.setOnClickListener(this);
         return rootView;
+    }
+
+    @Override
+    public void onItemClicked(int potition, String title, String name) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(name);
+        builder.setMessage(title);
+        builder.setPositiveButton("나가기",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.show();
     }
 }

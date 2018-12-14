@@ -41,6 +41,10 @@ public class CardItem {
     private String ranks;
     private String audiA;
     private Bitmap bitmap;
+    private String overview;
+
+
+
     private static String image;
     private static JSONObject entity, entity2;
     private static JSONArray array, array2;
@@ -48,12 +52,13 @@ public class CardItem {
     private static ArrayList<String> moviePost;
 
 
-    public CardItem(String title, String contents, String rank, String audi, Bitmap bitmap) {
+    public CardItem(String title, String contents, String rank, String audi, Bitmap bitmap, String overview) {
         this.title = title;
         this.contents = contents;
         this.ranks = rank;
         this.audiA = audi;
         this.bitmap = bitmap;
+        this.overview = overview;
     }
 
     public Bitmap getBitmap() {
@@ -76,6 +81,9 @@ public class CardItem {
     public String getContents() {
         return contents;
     }
+    public String getOverview() { return overview; }
+
+    public void setOverview(String overview) { this.overview = overview; }
 
     public void setContents(String contents) {
         this.contents = contents;
@@ -154,6 +162,7 @@ public class CardItem {
 
                     entity2 = (JSONObject)array2.get(j);
                     String image = (String) entity2.get("poster_path");
+                    String overview = (String)entity2.get("overview");
                     //moviePost.add("https://image.tmdb.org/t/p/w500"+image);
                     // Log.d("?ㅻ쭏5", moviePost.get(i).toString());
                     url3 = "https://image.tmdb.org/t/p/w500" + image;
@@ -171,7 +180,7 @@ public class CardItem {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    contacts.add(new CardItem(rank + "위", movieNm, "개봉날짜: " + openDt, "누적 관객: " + audiAcc, bitmap));
+                    contacts.add(new CardItem(rank + "위", movieNm, "개봉날짜: " + openDt, "누적 관객: " + audiAcc, bitmap, overview));
                     ++j;
                 }
 
