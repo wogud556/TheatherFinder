@@ -597,7 +597,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
                     @Override
                     public void onSnapshotReady(Bitmap bitmap) {
+                        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(getActivity(),
+                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSIONS);
 
+
+                            return;
+                        }
                         Date now = new Date();
                         android.text.format.DateFormat.format("hh:mm:ss", now);
                         try {
