@@ -262,6 +262,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 });
         builder.show();
     }
+    void mackshow(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("어플이 존재하지 않습니다");
+        builder.setMessage("플레이스토어로 이동할까요?");
+        builder.setPositiveButton("예",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=kr.co.mcdonalds.stadium.mobile")));
+                    }
+                });
+        builder.setNegativeButton("아니오",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://m.mcdonalds.co.kr/me/kor/main/main.do")));
+                    }
+                });
+        builder.show();
+    }
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         MapsInitializer.initialize(this.getActivity());
@@ -289,6 +307,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
                             .title(Location + " 스타벅스")
+                            .icon(BitmapDescriptorFactory.fromBitmap(small)));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        databaseReference.child("mack").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String Lnt = snapshot.child("Lng").getValue().toString();
+                    String Lat = snapshot.child("Lat").getValue().toString();
+                    // Object Lat = snapshot.eq("Lat");
+                    String Location = snapshot.child("Location").getValue().toString();
+                    BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.mac);
+                    Bitmap b = bitmapDrawable.getBitmap();
+                    Bitmap small = Bitmap.createScaledBitmap(b, 100, 100, false);
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
+                            .title(Location + " 맥도날드")
                             .icon(BitmapDescriptorFactory.fromBitmap(small)));
                 }
             }
@@ -390,6 +431,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 Intent lotte = context.getPackageManager().getLaunchIntentForPackage("kr.co.lottecinema.lcm");
                 Intent cgv1 = context.getPackageManager().getLaunchIntentForPackage("com.cgv.android.movieapp");
                 Intent star = context.getPackageManager().getLaunchIntentForPackage("com.starbucks.co");
+                Intent mack = context.getPackageManager().getLaunchIntentForPackage("kr.co.mcdonalds.stadium.mobile");
                 try {
                     String maker = marker.getTitle();
                     if (maker.contains("CGV")) {
@@ -422,6 +464,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                         }else{
                             star.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(star);
+                        }
+                    }else if(maker.contains("맥도날드")){
+                        if(mack == null){
+                            mackshow();
+                        }else{
+                            mack.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(mack);
                         }
                     }
                     else {
@@ -585,7 +634,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onClick(View view) {
                 String str = editText.getText().toString();
-                ;
                 List<Address> addressList = null;
                 try {
                     addressList = geocoder.getFromLocationName(
