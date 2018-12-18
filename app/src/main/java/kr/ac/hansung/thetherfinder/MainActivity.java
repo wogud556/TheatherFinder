@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Toast.makeText(MainActivity.this, "TheatherFinder\n 컴퓨터공학과 1492059 박재형, 1492076 장주영, 1492080 조준혁\n 사용 플랫폼 : Java, Firebase Auth, Firebase Realtime Database\n Google Map Api", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "TheatherFinder\n 컴퓨터공학과 1492059 박재형, 1492076 장주영, 1492080 조준혁\n 사용 플랫폼 : Java, Firebase Auth, Firebase Realtime Database\n Google Map Api, JsonParse", Toast.LENGTH_LONG).show();
         }else if(id == R.id.action_logout){
 
             logout();
@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity
     public void logout(){
         mfirebaseAuth.signOut();
         finish();
+        Toast.makeText(MainActivity.this, "로그아웃 되었습니다.", Toast.LENGTH_LONG).show();
         startActivity(new Intent(MainActivity.this, AuthActivity.class));
     }
 

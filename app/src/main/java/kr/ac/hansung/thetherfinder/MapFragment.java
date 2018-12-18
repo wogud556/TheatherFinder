@@ -287,7 +287,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         UiSettings ui = googleMap.getUiSettings();
         ui.setZoomControlsEnabled(true);
         ui.setCompassEnabled(true);
-        //currentLocation();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(37.535779, 126.734406), 14);
         googleMap.animateCamera(cameraUpdate);
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -299,7 +298,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                     String Lat = snapshot.child("Lat").getValue().toString();
                     // Object Lat = snapshot.eq("Lat");
                     String Location = snapshot.child("Location").getValue().toString();
-                    System.out.println(Lnt);
                     Log.d(TAG, "result" + snapshot.getValue());
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.starbucks);
                     Bitmap b = bitmapDrawable.getBitmap();
@@ -322,7 +320,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String Lnt = snapshot.child("Lng").getValue().toString();
                     String Lat = snapshot.child("Lat").getValue().toString();
-                    // Object Lat = snapshot.eq("Lat");
                     String Location = snapshot.child("Location").getValue().toString();
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.mac);
                     Bitmap b = bitmapDrawable.getBitmap();
@@ -346,7 +343,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                     String Lnt = snapshot.child("Lng").getValue().toString();
                     String Lat = snapshot.child("Lat").getValue().toString();
                     String Location = snapshot.child("Location").getValue().toString();
-                    System.out.println(Lnt);
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
                             .title(Location + " CGV")
@@ -367,7 +363,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                     String Lnt = snapshot.child("Lng").getValue().toString();
                     String Lat = snapshot.child("Lat").getValue().toString();
                     String Location = snapshot.child("Location").getValue().toString();
-                    System.out.println(Lnt);
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lnt)))
                             .title(Location + " 롯데시네마")
@@ -645,17 +640,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 try {
                     addressList = geocoder.getFromLocationName(
                             str, 10);
-                    System.out.println(addressList.get(0).toString());
-                    //콤마를 기준으로 split
-                    System.out.println(addressList.get(0).toString());
-
                     String[] splitStr = addressList.get(0).toString().split(",");
                     String address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1, splitStr[0].length());
-                    System.out.println(address);
                     String latitude = splitStr[10].substring(splitStr[10].indexOf("=") + 1); // 위도
                     String longitude = splitStr[12].substring(splitStr[12].indexOf("=") + 1); // 경도
-                    System.out.println(latitude);
-                    System.out.println(longitude);
 
                     // 좌표(위도, 경도) 생성
                     LatLng point = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
