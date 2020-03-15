@@ -1,11 +1,3 @@
-# TheatherFinder
+TheatherFinder
 
-## Recipe
-
-- [x] Make Project
-- [ ] 
-- [ ] 
-- [ ] 
-- [ ] 
-- [ ] 
-- [x] App
+use firebase database, android, java, use api
